@@ -23,7 +23,7 @@ import {
 
 //  Use your exact config from Firebase Console → Project settings → SDK setup
 const firebaseConfig = {
-  apiKey: "AIzaSyDFeblZ1C-c1LvnbT9zh-bbdTqcwEu6TL8",
+  apiKey: "***",
   authDomain: "shortkatto.firebaseapp.com",
   projectId: "shortkatto",
   storageBucket: "shortkatto.firebasestorage.app",
