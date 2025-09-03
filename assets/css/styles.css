@@ -24,20 +24,19 @@ img{max-width:100%;display:block;border-radius:16px}
 .container{max-width:1100px;margin:0 auto;padding:0 20px}
 
 .site-header{
-position:sticky;top:10px;z-index:50;
-background:transparent;
-border-bottom:none;
+  position:sticky;top:10px;z-index:50;
+  background:transparent;
+  border-bottom:none;
 }
 .nav{
-display:flex;align-items:center;justify-content:space-between;
-height:auto;padding:10px 14px;margin:6px auto 10px;
-background:rgba(255,255,255,.82);
-border:1px solid var(--border);
-border-radius:9999px;
-box-shadow:var(--shadow);
-backdrop-filter:saturate(1.2) blur(10px);
+  display:flex;align-items:center;justify-content:space-between;
+  height:auto;padding:10px 14px;margin:6px auto 10px;
+  background:rgba(255,255,255,.82);
+  border:1px solid var(--border);
+  border-radius:9999px;
+  box-shadow:var(--shadow);
+  backdrop-filter:saturate(1.2) blur(10px);
 }
-
 
 .logo{font-weight:800;color:var(--text);text-decoration:none;font-size:22px}
 .logo-mark{color:var(--text);background:linear-gradient(90deg,#5a5df0,#7a5af0);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
@@ -51,12 +50,14 @@ backdrop-filter:saturate(1.2) blur(10px);
 .btn-ghost{background:transparent;border:1px dashed var(--border);color:var(--text)}
 .btn-primary{background:linear-gradient(180deg,#ffd56e,#ffb800);color:#1b1200;border-color:#f5c64c;box-shadow:0 6px 18px rgba(255,184,0,.25)}
 .btn-primary:hover{filter:brightness(.98)}
+/* keep existing look; fix broken property name */
 .btn-outline{background:#fff;border:1px solid var(--primary);color:var(--primary)}
 .btn-outline:hover{background:var(--surface);border-color:var(--primary-600)}
 .btn-danger{background:var(--danger);color:#fff;border-color:transparent}
 .btn-google{display:inline-flex;gap:10px;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow)}
 .btn[aria-disabled="true"]{opacity:.6;pointer-events:none}
 
+/* HERO */
 .hero{padding:48px 0 24px;background:radial-gradient(1000px 400px at 0% 0%, #f1eeff 0%, transparent 60%), radial-gradient(900px 500px at 100% 20%, #fff1d6 0%, transparent 60%)}
 .hero-inner{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
 .hero-copy h1{font-size:64px;line-height:1.05;margin:0 0 12px;letter-spacing:-.02em}
@@ -66,6 +67,24 @@ backdrop-filter:saturate(1.2) blur(10px);
 .hero-trust{display:flex;align-items:center;gap:8px;color:var(--muted);font-weight:600}
 .hero-trust .dot{width:8px;height:8px;border-radius:50%;background:var(--primary)}
 
+.hero-title{
+display:inline-block;
+will-change:transform,opacity,text-shadow;
+animation:heroRise .7s ease-out both, heroGlow 3s ease-in-out 1.2s infinite alternate;
+}
+@keyframes heroRise{
+from{opacity:0;transform:translateY(10px) scale(.985)}
+to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes heroGlow{
+0%{text-shadow:0 0 0 rgba(90,93,240,0)}
+100%{text-shadow:0 6px 18px rgba(90,93,240,.28)}
+}
+@media (prefers-reduced-motion: reduce){
+.hero-title{animation:none}
+}
+
+/* STEPS */
 .steps{padding:72px 0;background:#f7faff;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .section-head h2{font-size:40px;margin:0}
 .section-head .subtle{margin-top:6px}
@@ -74,22 +93,65 @@ backdrop-filter:saturate(1.2) blur(10px);
 .step-title{min-height:48px;margin:0 0 24px}
 .step-number{position:absolute;bottom:16px;right:16px;font-size:48px;color:var(--primary);font-weight:800}
 
+/* BENEFITS */
 .benefits{padding:80px 0}
-.benefits-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:20px}
-.benefit-card{grid-column:span 4;background:#fff;border:1px solid var(--border);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
-.benefit-card.highlight{grid-column:span 6;background:linear-gradient(180deg,#5a5df0 0%,#8376ff 100%);color:#fff}
-.benefit-card.media{grid-column:span 6}
-.benefit-card.media img{margin-top:12px}
-.benefit-card.wide{grid-column:span 12;display:grid;grid-template-columns:1fr 1.2fr;gap:22px;align-items:center;background:#f6f0ff}
+/* pack items neatly and prevent leftover holes */
+.benefits-grid{
+  display:grid;
+  grid-template-columns:repeat(12,minmax(0,1fr));
+  gap:20px;
+  grid-auto-flow:row dense;
+}
+.benefit-card{
+  grid-column:span 4;
+  background:#fff;border:1px solid var(--border);
+  border-radius:18px;padding:22px;
+  box-shadow:var(--shadow);
+}
+.benefit-card.highlight{
+  /* makes rows add up (8 + 4 = 12) to avoid misalignment */
+  grid-column:span 8;
+  background:linear-gradient(180deg,#5a5df0 0%,#8376ff 100%);
+  color:#fff;
+}
+.benefit-card.media{
+  /* pairs with a 4-col card for a full row */
+  grid-column:span 8;
+}
+.benefit-card.media img{
+  margin-top:12px;
+  height:240px; /* consistent image height */
+  width:100%;
+  object-fit:cover;
+}
+.benefit-card.wide{
+  grid-column:span 12;
+  display:grid;grid-template-columns:1fr 1.2fr;gap:22px;align-items:center;
+  background:#f6f0ff
+}
 .benefit-card.wide img{border-radius:16px}
 
+/* PLANS */
 .plans{padding:80px 0;background:#fff}
-.plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
-.plan-card{border:1px solid var(--border);border-radius:18px;background:#fff;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+.plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;align-items:stretch}
+.plan-card{
+  border:1px solid var(--border);border-radius:18px;background:#fff;
+  box-shadow:var(--shadow);overflow:hidden;
+  display:flex;flex-direction:column
+}
 .plan-card.featured{border-color:#c8b4ff}
-.plan-media{position:relative}
+/* lock media area so all cards are equal height regardless of image aspect */
+.plan-media{
+  position:relative;
+  aspect-ratio:16/9;
+  overflow:hidden;
+}
+.plan-media img{
+  width:100%;height:100%;object-fit:cover;
+}
 .slots-badge{position:absolute;top:12px;left:12px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:8px 12px;font-weight:700;box-shadow:var(--shadow)}
-.plan-body{padding:18px}
+/* make card bodies equal – button stays pinned to the bottom */
+.plan-body{padding:18px;display:flex;flex-direction:column;gap:10px;flex:1}
 .plan-header{display:flex;align-items:flex-start;justify-content:space-between}
 .plan-header h3{margin:0}
 .price{display:flex;align-items:baseline;gap:6px}
@@ -97,15 +159,18 @@ backdrop-filter:saturate(1.2) blur(10px);
 .per{color:var(--muted)}
 .features{margin:12px 0 18px 18px}
 .features li{margin:8px 0}
+.subscribe-btn{margin-top:auto}
 .plan-card.unavailable{opacity:.9}
 .plan-card.unavailable .slots-badge{background:#2f3445;color:#fff;border-color:#2f3445}
 .plan-card.unavailable .slots-badge::before{content:"• ";color:#ff6b6b}
 
+/* FAQ */
 .faqs{padding:80px 0;background:#f7f4ff;border-top:1px solid var(--border)}
 .faq-list details{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin:10px 0;box-shadow:var(--shadow)}
 .faq-list summary{cursor:pointer;font-weight:700}
 .faq-content{margin-top:10px;color:var(--muted)}
 
+/* FOOTER */
 .site-footer{border-top:1px solid var(--border);padding:26px 0 40px;background:#fff}
 .footer-inner{display:flex;align-items:center;justify-content:space-between}
 .footer-links a{margin:0 8px;color:var(--text);text-decoration:none}
@@ -113,8 +178,10 @@ backdrop-filter:saturate(1.2) blur(10px);
 .legal{display:flex;align-items:center;justify-content:space-between;color:var(--muted);margin-top:16px}
 .policies a{color:var(--muted);text-decoration:none;margin-left:12px}
 
+/* TABLET */
 @media (max-width: 960px){
   .hero-inner{grid-template-columns:1fr;gap:18px}
+  .hero-copy h1{font-size:44px}
   .steps-grid{grid-template-columns:1fr 1fr}
   .benefits-grid{grid-template-columns:1fr 1fr}
   .benefit-card{grid-column:span 1}
@@ -122,6 +189,19 @@ backdrop-filter:saturate(1.2) blur(10px);
   .benefit-card.media{grid-column:span 2}
   .benefit-card.wide{grid-template-columns:1fr}
   .plan-grid{grid-template-columns:1fr}
+}
+
+/* MOBILE – prevent “squished” layout */
+@media (max-width: 640px){
+  .section-head h2{font-size:32px}
+  .hero-copy h1{font-size:36px}
+  .steps-grid{grid-template-columns:1fr}
+  .benefits-grid{grid-template-columns:1fr}
+  .benefit-card,
+  .benefit-card.highlight,
+  .benefit-card.media,
+  .benefit-card.wide{grid-column:auto}
+  .benefit-card.media img{height:200px}
 }
 
 .dashboard-body{background:linear-gradient(180deg,#fafaff,#ffffff)}
@@ -141,5 +221,3 @@ backdrop-filter:saturate(1.2) blur(10px);
 .manage-box{margin-top:6px}
 .manage-actions{display:flex;gap:10px;flex-wrap:wrap}
 .foot-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:18px}
-
-
