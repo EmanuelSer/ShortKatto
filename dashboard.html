@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ShortKatto — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/styles.css" />
+</head>
+<body class="dashboard-body">
+
+  <header class="site-header">
+    <div class="container nav">
+      <a class="logo" href="index.html"><span class="logo-mark">Short</span>Katto</a>
+      <div class="nav-cta">
+        <button id="logoutBtn" class="btn btn-outline small" style="display:none;">Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container dashboard">
+    <!-- AUTH CARD -->
+    <section id="authSection" class="card auth-card">
+      <h2 id="authTitle">Log in to your account</h2>
+      <p id="authSub" class="subtle">Welcome back! Please enter your details.</p>
+
+      <div style="text-align: center; margin-top: 16px;">
+        <button id="googleLoginBtn" type="button" class="btn btn-google">
+          <img alt="" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"> 
+          <span id="googleBtnText">Log in with Google</span>
+        </button>
+      </div>
+
+      <div class="auth-sep"><span>or continue with email</span></div>
+
+      <form id="authForm" class="auth-form">
+        <div class="row">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="you@company.com" required />
+        </div>
+        <div class="row">
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="••••••••" required />
+        </div>
+        <div class="row" style="margin-top: 12px;">
+          <button id="submitAuthBtn" type="submit" class="btn btn-primary" style="width: 100%;">Log in</button>
+        </div>
+      </form>
+      
+      <p id="authError" class="error" role="alert"></p>
+
+      <p class="auth-toggle-text">
+        <span id="togglePrompt">Don't have an account?</span>
+        <button id="toggleAuthModeBtn" type="button" class="btn-link">Sign up</button>
+      </p>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="dashSection" class="dash" style="display:none;">
+      <div class="dash-head">
+        <div>
+          <h2>Welcome <span id="displayName"></span></h2>
+          <p class="subtle">
+            Your workspace is provisioned shortly after payment. If you don’t see your links, try refreshing in a minute.
+          </p>
+        </div>
+        <div class="status-pill" id="subStatus">status: —</div>
+      </div>
+
+      <div class="resources-grid">
+        <article class="resource-card">
+          <h3>Trello Board</h3>
+          <p class="subtle">Track requests, revisions, and approvals.</p>
+          <a id="trelloLink" class="btn btn-outline" href="#" target="_blank" rel="noopener" aria-disabled="true">Not available yet</a>
+        </article>
+
+        <article class="resource-card">
+          <h3>Upload Files</h3>
+          <p class="subtle">Send us footage using your private upload link.</p>
+          <a id="dropboxRequestLink" class="btn btn-outline" href="#" target="_blank" rel="noopener" aria-disabled="true">Not available yet</a>
+        </article>
+      </div>
+
+      <div class="manage-box card">
+        <h3>Manage subscription</h3>
+        <p class="subtle">Update your payment method, pause, or cancel your subscription securely via Stripe.</p>
+        <div class="manage-actions">
+          <button id="portalBtn" class="btn btn-primary">Manage Billing & Subscription</button>
+        </div>
+        <p id="manageMsg" class="note" role="status"></p>
+      </div>
+
+      <div class="foot-actions">
+        <button id="refreshBtn" class="btn btn-ghost small">Refresh data</button>
+        <button id="logoutBtn2" class="btn btn-outline small">Log out</button>
+      </div>
+    </section>
+  </main>
+  <script src="/assets/js/config.js"></script>
+  <script type="module" src="/assets/js/dashboard.js"></script>
+
+</body>
+</html>
