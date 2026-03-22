@@ -1,8 +1,8 @@
 window.SK_CONFIG = {
-  calendlyUrl: "https://calendly.com/emanuel-ser-hdz/30min",
+  calendlyUrl: "https://calendly.com/shortkatto-contact/30min",
   stripe: {
-    basic: "https://buy.stripe.com/7sY14nefD0C86Ia9SF3ks00",
-    pro: "https://buy.stripe.com/9B600jdbz2Kgc2u7Kx3ks01"
+    basic: "https://buy.stripe.com/cNi3cvefDgB67Me3uh3ks02",
+    pro: "https://buy.stripe.com/fZueVdb3rbgMfeG6Gt3ks03"
   },
   stripePortalUrl: "https://billing.stripe.com/p/login/7sY14nefD0C86Ia9SF3ks00",
   // Manual, faux availability flags used only for UI
