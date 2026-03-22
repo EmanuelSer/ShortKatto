@@ -4,7 +4,7 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword, signInWithEmailAndPassword,
   signOut,
-  db, doc, onSnapshot
+  db, doc, onSnapshot, collection, query, where
 } from '../../firebase-config/firebase-init.js';
 
 const ready = (fn) =>
@@ -182,8 +182,10 @@ ready(async () => {
       if (logoutBtn1) logoutBtn1.style.display = '';
 
       // Listen to Firestore for user data (populated by Zapier)
-      unsubscribeUser = onSnapshot(doc(db, 'users', user.uid), (docSnap) => {
-        if (docSnap.exists()) {
+      const q = query(collection(db, 'users'), where('email', '==', user.email));
+      unsubscribeUser = onSnapshot(q, (querySnapshot) => {
+        if (!querySnapshot.empty) {
+          const docSnap = querySnapshot.docs[0];
           const data = docSnap.data();
           if (displayNameEl && data.name) displayNameEl.textContent = data.name;
           if (subStatusEl) {
@@ -193,6 +195,9 @@ ready(async () => {
             if (status === 'ACTIVE') {
               subStatusEl.style.backgroundColor = '#e6f4ea';
               subStatusEl.style.color = '#137333';
+            } else {
+              subStatusEl.style.backgroundColor = '#f1f5f9';
+              subStatusEl.style.color = '#475569';
             }
           }
           
