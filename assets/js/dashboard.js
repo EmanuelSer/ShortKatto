@@ -189,9 +189,8 @@ ready(async () => {
           const data = docSnap.data();
           if (displayNameEl && data.name) displayNameEl.textContent = data.name;
           if (subStatusEl) {
-            const plan = data.plan ? data.plan.toUpperCase() : 'NO PLAN';
             const status = data.status ? data.status.toUpperCase() : 'INACTIVE';
-            subStatusEl.textContent = `Plan: ${plan} | Status: ${status}`;
+            subStatusEl.textContent = `Status: ${status}`;
             if (status === 'ACTIVE') {
               subStatusEl.style.backgroundColor = '#e6f4ea';
               subStatusEl.style.color = '#137333';
