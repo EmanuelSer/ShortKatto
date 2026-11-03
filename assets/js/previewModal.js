@@ -9,7 +9,6 @@
  * No database or file lookups are performed; the URL is self-contained.
  */
 
-export const DEFAULT_TEST_VIDEO_ID = 'SjgMmo6_DH0';
 const YOUTUBE_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
 
 export function isShortVideo(input) {
@@ -88,19 +87,20 @@ export function initPreviewModal() {
   const modalTitleEl = document.getElementById('previewModalTitle');
   const badgeTextEl = modalEl ? modalEl.querySelector('.preview-pill-badge') : null;
   const directLinkEl = document.getElementById('previewDirectLink');
-  const floatingTrigger = document.getElementById('previewFloatingTrigger');
 
   if (!modalEl || !iframeEl) {
     return;
   }
 
   function openPreview(videoId, customTitle, isShort = false) {
-    const cleanId = extractVideoId(videoId) || DEFAULT_TEST_VIDEO_ID;
+    const cleanId = extractVideoId(videoId);
+    if (!cleanId) return;
+
     const embedUrl = buildEmbedUrl(cleanId);
     if (!embedUrl) return;
 
     if (modalTitleEl) {
-      modalTitleEl.textContent = customTitle || (isShort ? `Client YouTube Short Preview (${cleanId})` : `Client Video Preview (${cleanId})`);
+      modalTitleEl.textContent = customTitle || (isShort ? `Client YouTube Short Preview` : `Client Video Preview`);
     }
 
     if (badgeTextEl) {
@@ -140,13 +140,6 @@ export function initPreviewModal() {
   function closePreview(cleanUrl = true) {
     // Stop playback by clearing iframe src
     iframeEl.src = '';
-
-    // Mark dismissed in this browser session so normal homepage browsing isn't blocked
-    try {
-      sessionStorage.setItem('sk_preview_dismissed', 'true');
-    } catch {
-      // ignore
-    }
 
     // Hide modal and remove blur from homepage
     modalEl.setAttribute('aria-hidden', 'true');
@@ -206,7 +199,7 @@ export function initPreviewModal() {
       return;
     }
 
-    // 3. Check Hash Query (e.g. #v=SjgMmo6_DH0, #shorts/GkrGBnipZzE, or #?v=...)
+    // 3. Check Hash Query (e.g. #v=... or #shorts/...)
     const hash = window.location.hash || '';
     if (hash.includes('v=') || hash.includes('shorts/')) {
       const cleanHash = hash.replace(/^#\/?/, '').replace(/^\?/, '');
@@ -221,27 +214,9 @@ export function initPreviewModal() {
       }
     }
 
-    // 4. Fallback for AI Studio preview:
-    // If the visitor lands on the preview as it is, display the test video ID so it can be previewed immediately.
-    // If user previously closed it in this session, keep it closed so they can browse the homepage.
-    const isDismissed = sessionStorage.getItem('sk_preview_dismissed') === 'true';
-    if (!isDismissed) {
-      openPreview(DEFAULT_TEST_VIDEO_ID, 'Client Video Preview (SjgMmo6_DH0)', false);
-    } else {
-      closePreview(false);
-    }
+    // 4. Default: No video parameter in URL -> Stay completely hidden!
+    closePreview(false);
   }
-
-  // Floating trigger button on homepage to re-open the preview with SjgMmo6_DH0 anytime
-  floatingTrigger?.addEventListener('click', (e) => {
-    e.preventDefault();
-    try {
-      sessionStorage.removeItem('sk_preview_dismissed');
-    } catch {
-      // ignore
-    }
-    openPreview(DEFAULT_TEST_VIDEO_ID, 'Client Video Preview (SjgMmo6_DH0)');
-  });
 
   // Event Listeners for closing modal
   closeBtn?.addEventListener('click', (e) => {

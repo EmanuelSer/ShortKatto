@@ -7,9 +7,6 @@
 // YouTube video IDs are 11 characters containing letters, numbers, hyphens, and underscores.
 const YOUTUBE_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
 
-// Default test video ID requested for evaluation
-export const DEFAULT_TEST_VIDEO_ID = 'SjgMmo6_DH0';
-
 /**
  * Checks if the given input represents a YouTube Short (e.g. contains /shorts/ or shorts/).
  */
@@ -110,13 +107,11 @@ export function getYouTubeEmbedUrl(
 export function checkPreviewParams(
   searchQuery: string,
   hashString = '',
-  allowDefaultFallback = false,
   pathname = ''
 ): {
   shouldOpen: boolean;
   videoId: string | null;
   customTitle: string | null;
-  isDefaultFallback: boolean;
   isShort: boolean;
 } {
   // 1. Check pathname (e.g. /shorts/GkrGBnipZzE)
@@ -127,7 +122,6 @@ export function checkPreviewParams(
         shouldOpen: true,
         videoId: pathnameMatch[1],
         customTitle: null,
-        isDefaultFallback: false,
         isShort: true,
       };
     }
@@ -146,7 +140,6 @@ export function checkPreviewParams(
         shouldOpen: true,
         videoId: validSearchId,
         customTitle: titleParam ? titleParam.trim().slice(0, 80) : null,
-        isDefaultFallback: false,
         isShort,
       };
     }
@@ -169,7 +162,6 @@ export function checkPreviewParams(
           shouldOpen: true,
           videoId: validHashId,
           customTitle: titleParam ? titleParam.trim().slice(0, 80) : null,
-          isDefaultFallback: false,
           isShort,
         };
       }
@@ -178,16 +170,6 @@ export function checkPreviewParams(
     }
   }
 
-  // 4. Default fallback if requested (for live preview testing when URL params cannot be passed by host)
-  if (allowDefaultFallback) {
-    return {
-      shouldOpen: true,
-      videoId: DEFAULT_TEST_VIDEO_ID,
-      customTitle: 'Client Video Preview (SjgMmo6_DH0)',
-      isDefaultFallback: true,
-      isShort: false,
-    };
-  }
 
   return {
     shouldOpen: false,

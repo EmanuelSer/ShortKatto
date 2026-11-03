@@ -5,7 +5,6 @@ import {
   getYouTubeEmbedUrl,
   checkPreviewParams,
   getCleanUrlWithoutPreview,
-  DEFAULT_TEST_VIDEO_ID,
   isYouTubeShort,
 } from './previewVideo';
 
@@ -74,22 +73,22 @@ test('getYouTubeEmbedUrl constructs safe embed URL with origin and autoplay', ()
   );
 });
 
-test('checkPreviewParams detects presence of v parameter in search query', () => {
-  const emptyRes = checkPreviewParams('', '', false);
+test('checkPreviewParams stays hidden by default when no v parameter is present', () => {
+  const emptyRes = checkPreviewParams('', '');
   assert.equal(emptyRes.shouldOpen, false);
   assert.equal(emptyRes.videoId, null);
 
-  const validRes = checkPreviewParams('?v=SjgMmo6_DH0', '', false);
+  const normalBrowseRes = checkPreviewParams('?ref=twitter&plan=pro', '');
+  assert.equal(normalBrowseRes.shouldOpen, false);
+  assert.equal(normalBrowseRes.videoId, null);
+
+  const validRes = checkPreviewParams('?v=SjgMmo6_DH0', '');
   assert.equal(validRes.shouldOpen, true);
   assert.equal(validRes.videoId, 'SjgMmo6_DH0');
 
-  const hashRes = checkPreviewParams('', '#v=SjgMmo6_DH0', false);
+  const hashRes = checkPreviewParams('', '#v=SjgMmo6_DH0');
   assert.equal(hashRes.shouldOpen, true);
   assert.equal(hashRes.videoId, 'SjgMmo6_DH0');
-
-  const fallbackRes = checkPreviewParams('', '', true);
-  assert.equal(fallbackRes.shouldOpen, true);
-  assert.equal(fallbackRes.videoId, DEFAULT_TEST_VIDEO_ID);
 });
 
 test('isYouTubeShort identifies shorts URLs and query parameters', () => {
@@ -103,19 +102,19 @@ test('isYouTubeShort identifies shorts URLs and query parameters', () => {
 
 test('checkPreviewParams detects YouTube Shorts from pathname or v parameter', () => {
   // Direct pathname
-  const pathRes = checkPreviewParams('', '', false, '/shorts/GkrGBnipZzE');
+  const pathRes = checkPreviewParams('', '', '/shorts/GkrGBnipZzE');
   assert.equal(pathRes.shouldOpen, true);
   assert.equal(pathRes.videoId, 'GkrGBnipZzE');
   assert.equal(pathRes.isShort, true);
 
   // Parameter with /shorts/ path
-  const paramShortRes = checkPreviewParams('?v=/shorts/GkrGBnipZzE', '', false);
+  const paramShortRes = checkPreviewParams('?v=/shorts/GkrGBnipZzE', '');
   assert.equal(paramShortRes.shouldOpen, true);
   assert.equal(paramShortRes.videoId, 'GkrGBnipZzE');
   assert.equal(paramShortRes.isShort, true);
 
   // Parameter with full shorts URL
-  const fullShortUrlRes = checkPreviewParams('?v=https://youtube.com/shorts/GkrGBnipZzE', '', false);
+  const fullShortUrlRes = checkPreviewParams('?v=https://youtube.com/shorts/GkrGBnipZzE', '');
   assert.equal(fullShortUrlRes.shouldOpen, true);
   assert.equal(fullShortUrlRes.videoId, 'GkrGBnipZzE');
   assert.equal(fullShortUrlRes.isShort, true);
