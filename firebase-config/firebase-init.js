@@ -54,7 +54,7 @@ export {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  // Firestore helpers (future use)
+  // Firestore helpers
   doc, getDoc, setDoc, updateDoc, serverTimestamp, onSnapshot,
   collection, query, where
 };

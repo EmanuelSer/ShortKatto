@@ -1,80 +1,20 @@
-# ShortKatto
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
-ShortKatto is a subscription-based video editing service designed to provide creators, growing channels, and teams with studio-quality edits in days, not weeks. The platform allows users to subscribe to a plan, submit footage, and receive unlimited editing and revisions.
+# Run and deploy your AI Studio app
 
-## Features
+This contains everything you need to run your app locally.
 
-- **Modern Landing Page**: A fully responsive, conversion-optimized landing page detailing the 4-step process, service benefits, pricing plans (Basic & Pro), and FAQs.
-- **Client Dashboard**: A secure portal where authenticated users can:
-  - Access their dedicated Trello board to manage requests and revisions.
-  - Upload raw footage directly via a secure Dropbox request link.
-  - Manage their billing and subscription seamlessly.
-- **Authentication**: Secure login flow using Firebase Authentication (Google Sign-In and Email/Passwordless).
-- **Responsive Design**: Carefully crafted CSS ensuring a flawless experience across desktop, tablet, and mobile devices.
-- **Motion Graphics Add-on**: Optional recurring add-on for professional motion graphics.
+View your app in AI Studio: https://ai.studio/apps/04768505-482c-4358-ad99-fdc6a6e34285
 
-## Tech Stack
+## Run Locally
 
-- **Frontend**: HTML5, CSS3 (Custom CSS with CSS Variables), Vanilla JavaScript (ES Modules).
-- **Backend / BaaS**: Firebase (Authentication, Firestore).
-- **Build Tool**: Vite.
+**Prerequisites:**  Node.js
 
-## Project Structure
 
-```text
-├── index.html              # Main landing page
-├── dashboard.html          # Secure client portal
-├── assets/
-│   ├── css/
-│   │   └── styles.css      # Global stylesheet and responsive rules
-│   └── js/
-│       ├── main.js         # Landing page interactions and auth state
-│       ├── dashboard.js    # Dashboard logic, data fetching, and UI updates
-│       └── config.js       # Firebase configuration and initialization
-├── package.json            # Project dependencies and scripts
-└── vite.config.js          # Vite configuration
-```
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- npm
-
-### Installation
-
-1. Clone the repository or download the source code.
-2. Install the dependencies:
-
-```bash
-npm install
-```
-
-### Environment Variables
-
-Ensure your Firebase configuration is properly set up in `assets/js/config.js` or via environment variables if configured in your deployment environment.
-
-### Running Locally
-
-Start the Vite development server:
-
-```bash
-npm run dev
-```
-
-The application will be available at `http://localhost:3000`.
-
-### Building for Production
-
-To create a production-ready build:
-
-```bash
-npm run build
-```
-
-The compiled assets will be output to the `dist/` directory, ready to be deployed to any static hosting service.
-
-## License
-
-© ShortKatto. All rights reserved.
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

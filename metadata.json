@@ -1,5 +1,6 @@
 {
-  "name": "",
-  "description": "",
-  "requestFramePermissions": []
+  "name": "ShortKatto Video Preview",
+  "description": "ShortKatto subscription video editing platform with instant unlisted video preview modal.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

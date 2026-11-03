@@ -269,6 +269,68 @@
     </section>
   </main>
 
+  <!-- ISOLATED PREVIEW MODAL (Default: Hidden. Triggers immediately only when ?v= is present in URL) -->
+  <aside
+    id="videoPreviewModal"
+    class="preview-modal-overlay"
+    role="dialog"
+    aria-modal="true"
+    aria-hidden="true"
+    aria-labelledby="previewModalTitle"
+    style="display: none;"
+  >
+    <div class="preview-modal-dialog">
+      <!-- Modal Header -->
+      <div class="preview-modal-header">
+        <div class="preview-meta-wrap">
+          <div class="preview-badge-row">
+            <span class="preview-pill-badge">
+              <span class="preview-pulse-dot" aria-hidden="true"></span>
+              Client Draft Preview
+            </span>
+          </div>
+          <h2 id="previewModalTitle" class="preview-modal-title">Client Video Preview</h2>
+          <p class="preview-modal-subtitle">Private unlisted review. Access is restricted to this URL.</p>
+        </div>
+        <button
+          type="button"
+          id="previewCloseBtn"
+          class="preview-close-button"
+          aria-label="Close video preview"
+          title="Close preview (Esc)"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- 16:9 Video Canvas -->
+      <div class="preview-video-container">
+        <iframe
+          id="previewVideoIframe"
+          src=""
+          title="Client Video Draft Player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+        ></iframe>
+      </div>
+
+      <!-- Modal Footer Action Bar -->
+      <div class="preview-modal-footer">
+        <div class="preview-footer-info">
+          <strong>Review your edit draft.</strong> Ready for production-ready turnarounds and unlimited revisions? Select your subscription plan below.
+        </div>
+        <div class="preview-footer-actions">
+          <button type="button" id="previewExitBtn" class="btn btn-outline small">
+            Exit Preview
+          </button>
+          <a href="#plans" id="previewPlansCtaBtn" class="btn btn-primary small">
+            View Plans & Subscribe →
+          </a>
+        </div>
+      </div>
+    </div>
+  </aside>
+
   <footer class="site-footer">
     <div class="container footer-inner">
       <nav class="footer-links">
