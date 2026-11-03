@@ -7,8 +7,20 @@
 // YouTube video IDs are 11 characters containing letters, numbers, hyphens, and underscores.
 const YOUTUBE_ID_REGEX = /^[a-zA-Z0-9_-]{11}$/;
 
+// Default test video ID requested for evaluation
+export const DEFAULT_TEST_VIDEO_ID = 'SjgMmo6_DH0';
+
 /**
- * Extracts and sanitizes a YouTube video ID from a raw string or URL.
+ * Checks if the given input represents a YouTube Short (e.g. contains /shorts/ or shorts/).
+ */
+export function isYouTubeShort(input: string | null | undefined): boolean {
+  if (!input) return false;
+  const trimmed = input.trim().toLowerCase();
+  return trimmed.includes('/shorts/') || trimmed.includes('shorts/') || trimmed.includes('type=short');
+}
+
+/**
+ * Extracts and sanitizes a YouTube video ID from a raw string, URL, or YouTube Shorts path.
  * Returns the 11-character video ID if valid, or null if invalid/not found.
  */
 export function extractYouTubeVideoId(input: string | null | undefined): string | null {
@@ -17,18 +29,29 @@ export function extractYouTubeVideoId(input: string | null | undefined): string 
   const trimmed = input.trim();
   if (!trimmed) return null;
 
-  // Direct 11-character ID check
+  // Direct 11-character ID check (e.g. "SjgMmo6_DH0" or "GkrGBnipZzE")
   if (YOUTUBE_ID_REGEX.test(trimmed)) {
     return trimmed;
   }
 
-  // If the user accidentally provided a full YouTube URL in the v= parameter
-  // e.g. "https://www.youtube.com/watch?v=dQw4w9WgXcQ" or "https://youtu.be/dQw4w9WgXcQ"
+  // Handle relative shorts paths like "/shorts/GkrGBnipZzE" or "shorts/GkrGBnipZzE"
+  const relativeShortsMatch = trimmed.match(/(?:^|\/)shorts\/([a-zA-Z0-9_-]{11})(?:[&?#\/]|$)/i);
+  if (relativeShortsMatch && relativeShortsMatch[1] && YOUTUBE_ID_REGEX.test(relativeShortsMatch[1])) {
+    return relativeShortsMatch[1];
+  }
+
+  // If the user provided a full YouTube URL in the v= parameter
+  // e.g. "https://www.youtube.com/shorts/GkrGBnipZzE" or "https://www.youtube.com/watch?v=..."
   try {
-    // If it looks like a URL, parse it
     if (trimmed.includes('youtube.com') || trimmed.includes('youtu.be')) {
       const urlString = trimmed.startsWith('http') ? trimmed : `https://${trimmed}`;
       const url = new URL(urlString);
+
+      // Handle YouTube Shorts URL: /shorts/VIDEO_ID
+      const shortsMatch = url.pathname.match(/\/shorts\/([a-zA-Z0-9_-]{11})/i);
+      if (shortsMatch && shortsMatch[1] && YOUTUBE_ID_REGEX.test(shortsMatch[1])) {
+        return shortsMatch[1];
+      }
 
       if (url.hostname.includes('youtu.be')) {
         const id = url.pathname.replace(/^\//, '').split(/[?#&]/)[0];
@@ -40,7 +63,7 @@ export function extractYouTubeVideoId(input: string | null | undefined): string 
         if (id && YOUTUBE_ID_REGEX.test(id)) return id;
 
         // Path formats like /embed/VIDEO_ID or /v/VIDEO_ID
-        const match = url.pathname.match(/\/(?:embed|v)\/([a-zA-Z0-9_-]{11})/);
+        const match = url.pathname.match(/\/(?:embed|v)\/([a-zA-Z0-9_-]{11})/i);
         if (match && match[1]) return match[1];
       }
     }
@@ -48,8 +71,8 @@ export function extractYouTubeVideoId(input: string | null | undefined): string 
     // Non-URL string that failed parsing
   }
 
-  // Regex search fallback for an 11-character ID within safe bounds (URL query parameter or path segment)
-  const generalMatch = trimmed.match(/(?:[?&]v=|\/embed\/|\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:[&?#]|$)/);
+  // Regex search fallback for an 11-character ID within safe bounds (query parameter, shorts path, or embed path)
+  const generalMatch = trimmed.match(/(?:[?&]v=|\/embed\/|\/watch\?v=|\/shorts\/|shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})(?:[&?#\/]|$)/i);
   if (generalMatch && generalMatch[1] && YOUTUBE_ID_REGEX.test(generalMatch[1])) {
     return generalMatch[1];
   }
@@ -58,7 +81,7 @@ export function extractYouTubeVideoId(input: string | null | undefined): string 
 }
 
 /**
- * Builds a secure, privacy-enhanced YouTube embed URL with autoplay enabled.
+ * Builds a secure YouTube embed URL with origin, playsinline, and autoplay options.
  */
 export function getYouTubeEmbedUrl(
   videoId: string,
@@ -66,7 +89,7 @@ export function getYouTubeEmbedUrl(
     autoplay?: boolean;
     rel?: boolean;
     controls?: boolean;
-    enableJsApi?: boolean;
+    origin?: string;
   } = {}
 ): string {
   const cleanId = extractYouTubeVideoId(videoId);
@@ -75,43 +98,108 @@ export function getYouTubeEmbedUrl(
   const autoplay = options.autoplay !== false ? '1' : '0';
   const rel = options.rel ? '1' : '0';
   const controls = options.controls !== false ? '1' : '0';
+  const originParam = options.origin ? `&origin=${encodeURIComponent(options.origin)}` : '';
 
-  // Use youtube-nocookie.com for privacy and seamless playback
-  return `https://www.youtube-nocookie.com/embed/${cleanId}?autoplay=${autoplay}&rel=${rel}&controls=${controls}&modestbranding=1&playsinline=1`;
+  return `https://www.youtube.com/embed/${cleanId}?autoplay=${autoplay}&rel=${rel}&controls=${controls}&modestbranding=1&playsinline=1&enablejsapi=1${originParam}`;
 }
 
 /**
- * Parses a window.location.search query string and returns preview status and metadata.
+ * Parses query strings (search and hash) and returns preview status.
+ * Can fallback to DEFAULT_TEST_VIDEO_ID if no v parameter is provided and fallback is enabled.
  */
-export function checkPreviewParams(searchQuery: string): {
+export function checkPreviewParams(
+  searchQuery: string,
+  hashString = '',
+  allowDefaultFallback = false,
+  pathname = ''
+): {
   shouldOpen: boolean;
   videoId: string | null;
   customTitle: string | null;
+  isDefaultFallback: boolean;
+  isShort: boolean;
 } {
-  if (!searchQuery) {
-    return { shouldOpen: false, videoId: null, customTitle: null };
+  // 1. Check pathname (e.g. /shorts/GkrGBnipZzE)
+  if (pathname) {
+    const pathnameMatch = pathname.match(/(?:^|\/)shorts\/([a-zA-Z0-9_-]{11})(?:[\/?#]|$)/i);
+    if (pathnameMatch && pathnameMatch[1] && YOUTUBE_ID_REGEX.test(pathnameMatch[1])) {
+      return {
+        shouldOpen: true,
+        videoId: pathnameMatch[1],
+        customTitle: null,
+        isDefaultFallback: false,
+        isShort: true,
+      };
+    }
   }
 
+  // 2. Check search query (?v=... or ?shorts=...)
   try {
-    const params = new URLSearchParams(searchQuery);
-    const rawV = params.get('v');
-    const videoId = extractYouTubeVideoId(rawV);
+    const searchParams = new URLSearchParams(searchQuery);
+    const searchV = searchParams.get('v') || searchParams.get('shorts');
+    const validSearchId = extractYouTubeVideoId(searchV);
 
-    const titleParam = params.get('title');
-    const customTitle = titleParam ? titleParam.trim().slice(0, 80) : null;
-
-    return {
-      shouldOpen: videoId !== null,
-      videoId,
-      customTitle,
-    };
+    if (validSearchId) {
+      const titleParam = searchParams.get('title');
+      const isShort = isYouTubeShort(searchV) || searchParams.get('type') === 'short' || searchParams.get('format') === 'short';
+      return {
+        shouldOpen: true,
+        videoId: validSearchId,
+        customTitle: titleParam ? titleParam.trim().slice(0, 80) : null,
+        isDefaultFallback: false,
+        isShort,
+      };
+    }
   } catch {
-    return { shouldOpen: false, videoId: null, customTitle: null };
+    // ignore
   }
+
+  // 3. Check hash string (#v=... or #/shorts/...)
+  if (hashString) {
+    try {
+      const cleanHash = hashString.replace(/^#\/?/, '').replace(/^\?/, '');
+      const hashParams = new URLSearchParams(cleanHash.includes('?') ? cleanHash.split('?')[1] : cleanHash);
+      const hashV = hashParams.get('v') || hashParams.get('shorts') || (cleanHash.startsWith('v=') ? cleanHash.split('v=')[1]?.split('&')[0] : null) || (cleanHash.includes('shorts/') ? cleanHash : null);
+      const validHashId = extractYouTubeVideoId(hashV);
+
+      if (validHashId) {
+        const titleParam = hashParams.get('title');
+        const isShort = isYouTubeShort(hashV) || isYouTubeShort(cleanHash);
+        return {
+          shouldOpen: true,
+          videoId: validHashId,
+          customTitle: titleParam ? titleParam.trim().slice(0, 80) : null,
+          isDefaultFallback: false,
+          isShort,
+        };
+      }
+    } catch {
+      // ignore
+    }
+  }
+
+  // 4. Default fallback if requested (for live preview testing when URL params cannot be passed by host)
+  if (allowDefaultFallback) {
+    return {
+      shouldOpen: true,
+      videoId: DEFAULT_TEST_VIDEO_ID,
+      customTitle: 'Client Video Preview (SjgMmo6_DH0)',
+      isDefaultFallback: true,
+      isShort: false,
+    };
+  }
+
+  return {
+    shouldOpen: false,
+    videoId: null,
+    customTitle: null,
+    isDefaultFallback: false,
+    isShort: false,
+  };
 }
 
 /**
- * Helper to remove 'v' and optional 'title' from the current URL without a page reload.
+ * Helper to remove 'v' and optional 'title' from current search query.
  */
 export function getCleanUrlWithoutPreview(currentSearch: string, currentPath: string): string {
   try {
